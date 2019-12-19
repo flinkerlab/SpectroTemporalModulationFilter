@@ -60,7 +60,13 @@ end
         
 SignalLen = length(signal);
 [p,q] = rat(Args.TF_ReFs /Fs);
-
+if strcmp(Args.CB_Filter,'gauss') %optimize memory allocaiton for speed up
+    SigFiltered = zeros(Args.Nchans,length(signal));
+    SigFilteredAmp = SigFiltered;
+    this = resample(abs(SigFilteredAmp(1,:)),p,q); % need this as the length of output may vary due to rounding and an explicit computaiton fails at some values
+    TF = zeros(Args.Nchans,length(this)); 
+end
+t0=tic;
 for i = 1:Args.Nchans
         switch Args.CB_Filter
             case 'gauss'
@@ -103,8 +109,8 @@ TFout.TFlog(TFout.TFlog<0) = 0;
 TFout.x_axis = 1/Args.TF_ReFs:1/Args.TF_ReFs:size(TF,2)/Args.TF_ReFs;
 TFout.y_axis = Args.CB_CenterFrs;
 TFout.Args = Args;
-TFout.Args.Fs = Fs; % save Fs for upsampling in Spectrum Inversion
 
+TFout.Args.Fs = Fs; % save Fs for upsampling in Spectrum Inversion
 if Args.do_plot 
     Chans_disp = 6;
     jm =  fix(Args.Nchans/Chans_disp);
