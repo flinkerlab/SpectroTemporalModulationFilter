@@ -70,8 +70,9 @@ t0=tic;
 for i = 1:Args.Nchans
         switch Args.CB_Filter
             case 'gauss'
-                [SigFiltered(i,:) ,Pl(i)]= band_pass(signal,Fs,Args.CB_FrLow(i),Args.CB_FrHigh(i),1,'HMFWgauss');
-                SigFilteredAmp(i,:) = (hilbert(SigFiltered(i,:)));
+                %[SigFiltered(i,:) ,Pl(i)]= band_pass(signal,Fs,Args.CB_FrLow(i),Args.CB_FrHigh(i),1,'HMFWgauss');
+                %SigFilteredAmp(i,:) = (hilbert(SigFiltered(i,:)));
+                SigFilteredAmp(i,:)= my_hilbert(signal,Fs,Args.CB_FrLow(i),Args.CB_FrHigh(i),1,'HMFWgauss');            %my_hilbert will bandpass and hilbret with one pass of fft and ifft (isntead of the above commented code of two passes)
                 TF(i,:) = resample(abs(SigFilteredAmp(i,:)),p,q);
             case 'FIR'
                 SigFiltered(i,:) = CB_FIR_filter(signal, Fs, SignalLen, Args.CB_FIR_order,Args.CB_FrLow(i),Args.CB_FrHigh(i));
